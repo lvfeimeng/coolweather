@@ -2,6 +2,7 @@ package com.almn.coolweather;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.almn.coolweather.db.City;
 import com.almn.coolweather.db.County;
 import com.almn.coolweather.db.Province;
+import com.almn.coolweather.gson.Weather;
 import com.almn.coolweather.util.HttpUtil;
 import com.almn.coolweather.util.Utility;
 import com.bumptech.glide.util.Util;
@@ -52,7 +54,7 @@ public class ChooseAreaFragment extends Fragment {
 
     private Province selectedProvince;
     private City selectedCity;
-    private County selectedCounty;
+    //private County selectedCounty;
 
     private int currentLevel;
 
@@ -84,6 +86,19 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String weatherId = countyList.get(position).getWeatherId();
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }else if (getActivity() instanceof WeatherActivity){
+                        WeatherActivity activity=(WeatherActivity)getActivity();
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefresh.setRefreshing(true);
+                        activity.requestWeather(weatherId);
+                    }
                 }
             }
         });
